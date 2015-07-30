@@ -35,6 +35,13 @@ app = Flask(__name__)
 health = HealthCheck(app, "/healthcheck")
 envdump = EnvironmentDump(app, "/environment")
 
+# or use init_app with flask app factory
+health = HealthCheck()
+envdump = EnvironmentDump()
+
+health.init_app(app, "/healthcheck")
+envdump.init_app(app, "/environment")
+
 # add your own check function to the healthcheck
 def redis_available():
     client = _redis_client()
@@ -120,7 +127,7 @@ In Runscope's infrastructure, the /healthcheck endpoint is hit surprisingly
 often. haproxy runs on every server, and each haproxy hits every healthcheck
 twice a minute. (So if we have 30 servers in our infrastructure, that's 60
 healthchecks per minute to every Flask service.) Plus, monit hits every
-healthcheck 6 times a minute. 
+healthcheck 6 times a minute.
 
 To avoid putting too much strain on backend services, health check results can
 be cached in process memory. By default, health checks that succeed are cached

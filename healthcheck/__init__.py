@@ -67,6 +67,12 @@ class HealthCheck(object):
         if self.app and self.path:
             app.add_url_rule(self.path, view_func=self.check, **options)
 
+    def init_app(self, app=None, path=None, **kwargs):
+        _healthcheck = HealthCheck(app, path, **kwargs)
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['healthcheck'] = _healthcheck
+        return _healthcheck
+
     def add_check(self, func):
         self.checkers.append(func)
 
@@ -142,6 +148,12 @@ class EnvironmentDump(object):
 
         if self.app and self.path:
             app.add_url_rule(self.path, view_func=self.dump_environment)
+
+    def init_app(self, app=None, path=None, **kwargs):
+        _environmentdump = EnvironmentDump(app, path, **kwargs)
+        app.extensions = getattr(app, 'extensions', {})
+        app.extensions['environmentdump'] = _environmentdump
+        return _environmentdump
 
     def add_section(self, name, func):
         if name in self.functions:
